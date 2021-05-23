@@ -1,13 +1,26 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import theme from '../theme-styles'
+import LazyLoad from 'react-lazyload'
+import { TransitionGroup, CSSTransition } from 'react-transition-group'
+import Masonry from 'react-masonry-css'
 
 const PhotoGridContainer = styled.div`
   grid-column: span ${props => props.gridSpan} / span ${props => props.gridSpan};
   grid-column-start: ${props => props.gridStart};
   padding: 1rem 2rem;
+  width: 100%;
   max-width: 1400px;
   margin: 0 auto;
+  & .photo-masonry {
+    display: flex;
+    margin-left: -32px;
+    width: auto;
+  }
+  & .photo-masonry_column {
+    padding-left: 32px;
+    background-clip: padding-box;
+  }
 `
 
 const HeaderTitle = styled.p`
@@ -24,11 +37,6 @@ const HeaderTitle = styled.p`
   }
 `
 
-const PhotoGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 2rem;
-`
 const PhotoCard = styled.div`
   position: relative;
   border-radius: 1rem;
@@ -36,6 +44,7 @@ const PhotoCard = styled.div`
   box-shadow: -8px -8px 16px 0 #FFFFFF, 8px 8px 16px 0 ${theme.color.neutral_300};
   grid-column: span 3 / span 3;
   z-index: 1;
+  margin-bottom: 2rem;
   &:before {
     content: '';
     position: absolute;
@@ -65,22 +74,55 @@ const PhotoCard = styled.div`
   }
 `
 
+const breakpoints = {
+  default: 4,
+  1024: 4,
+  768: 3,
+  640: 2
+}
+
 
 const ThePhotosGrid = ({ gridSpan, gridStart }) => {
+  const [photos, setPhotos] = useState([])
+  useEffect(()=> {
+    async function fetchAPI () {
+      const url = 'https://jsonplaceholder.typicode.com/photos'
+      const response = await fetch(url)
+      const data = await response.json()
+      setPhotos(data)
+    }
+
+    fetchAPI()
+  }, [])
   return (
-    <PhotoGridContainer gridSpan={gridSpan} gridStart={gridStart}>
-      <HeaderTitle>Photo Grid</HeaderTitle>
-      <PhotoGrid>
-        <PhotoCard>
-          <div className="photo-card-header">
-            <img src="https://via.placeholder.com/600/92c952" alt=""/>
-          </div>
-          <div className="photo-card-body">
-            <p className="title">accusamus beatae ad facilis cum similique qui sunt</p>
-          </div>
-        </PhotoCard>
-      </PhotoGrid>
-    </PhotoGridContainer>
+    <>
+      <PhotoGridContainer gridSpan={gridSpan} gridStart={gridStart}>
+        <HeaderTitle>Photo Grid</HeaderTitle>
+        <TransitionGroup className="photo-grid">
+          <Masonry breakpointCols={breakpoints}
+                   className="photo-masonry"
+                   columnClassName="photo-masonry_column">
+            {photos.map((item) => (
+              <LazyLoad key={item.id} height={200} once  offset={100}>
+                <CSSTransition in={true}
+                               timeout={600}
+                               classNames="photo-card"
+                >
+                    <PhotoCard>
+                      <div className="photo-card-header">
+                        <img src={item.url} alt=""/>
+                      </div>
+                      <div className="photo-card-body">
+                        <p className="title">{item.title}</p>
+                      </div>
+                    </PhotoCard>
+                </CSSTransition>
+              </LazyLoad>
+            ))}
+          </Masonry>
+        </TransitionGroup>
+      </PhotoGridContainer>
+    </>
   )
 }
 
