@@ -11,6 +11,8 @@ const GlobalStyle = createGlobalStyle`
   body, html, #root {
     height: 100%;
     width: 100%;
+    background-color: #E0E5EC;
+    font-family: 'Noto Sans JP', sans-serif;
   }
 `
 
