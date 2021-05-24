@@ -85,6 +85,11 @@ function App() {
       progress: undefined,
       progressClassName: 'toast-progress-bar-success'
     })
+    if(window.matchMedia('(max-width: 1024px)').matches) {
+      setIsActive(false)
+    } else {
+      setIsActive(true)
+    }
   }
 
   const updatePost = (post) => {
@@ -116,7 +121,7 @@ function App() {
           <TheSidebar addPost={(e) => pushData(e)}
                       selectedPost={selectedPost}
                       isEdit={isEdit} cancelEdit={()=> cancelEdit()}
-                      deletePost={()=> [deletePost(), setIsActive(false)]}
+                      deletePost={()=> deletePost()}
                       updatePost={(post)=> updatePost(post)}
                       close={()=> [setIsActive(false), setIsEdit(false)]}
           />
