@@ -5,6 +5,8 @@ const theme = {
     neutral_300: '#C0CCDE',
     neutral_400: '#95A6B5',
     neutral_500: '#2E3E4D',
+    neutral_600: '#171F26',
+    neutral_700: '#0F151A',
   }
 }
 
